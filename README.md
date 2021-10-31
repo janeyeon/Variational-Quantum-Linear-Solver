@@ -28,9 +28,9 @@ The detailed process is written in the implementation below
 
 Our code is divided into two main parts.
 
-First is `[vqls.py](http://vqls.py)` file which is provided by the existing qiskit, and the `[customVQLS.py](http://customVQLS.py)` file that has been simplified. 
+First is `vqls.py` file which is provided by the existing qiskit, and the `customVQLS.py` file that has been simplified. 
 
-The main different point is the format of a circuit. When `[vqls.py](http://vqls.py)` using quantum circuit on the qiskit itself, `[customVQLS.py](http://customVQLS.py)` using `Mathematica` and `SymPy` to implement the circuit. By using this two method, we reduced the computational cost and improved the performance.
+The main different point is the format of a circuit. When `vqls.py` using quantum circuit on the qiskit itself, `customVQLS.py` using `Mathematica` and `SymPy` to implement the circuit. By using this two method, we reduced the computational cost and improved the performance.
 
 # Implementation
 
