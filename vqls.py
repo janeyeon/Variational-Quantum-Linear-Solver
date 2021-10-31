@@ -112,7 +112,7 @@ def special_had_test(gate_type, qubits, auxiliary_index, parameters, reg):
 
 #Implements the entire cost function on the quantum circuit (sampling, 100000 shots)
 
-# def calculate_cost_function(parameters):
+def calculate_cost_function(parameters):
 
     global opt
 
