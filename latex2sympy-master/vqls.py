@@ -108,7 +108,7 @@ def special_had_test(gate_type, qubits, auxiliary_index, parameters, reg):
 
 # Implements the entire cost function on the quantum circuit
 
-def vqls_calculate_cost_function(parameters, vqls_op_obj, callback):
+def calculate_cost_function(parameters, op_obj, callback):
     
     global opt
 
@@ -189,52 +189,8 @@ def vqls_calculate_cost_function(parameters, vqls_op_obj, callback):
 
     print(1-float(overall_sum_2/overall_sum_1))
     # 이제 이 값을 op_obj.f 에 넣어준다 
-    callback(xk= 1-float(overall_sum_2/overall_sum_1), obj=vqls_op_obj)
+    callback(xk= 1-float(overall_sum_2/overall_sum_1), obj=op_obj)
 
     return 1-float(overall_sum_2/overall_sum_1)
-
-
-
-# # cost function 을 minimize 하는 parameter alpha 값을 구한다 (9개)
-
-# out = minimize(vqls_calculate_cost_function, x0= op_obj.x_0, args=(op_obj, callback), options={'maxiter':iter}, method="COBYLA")
-
-# plt.plot(x, op_obj.f)
-# plt.show()
-
-# # 여기서 부터는 구한 결과로 비교하는 부분 
-
-# # 구한 output 을 쪼갠다  
-# # 아직 out을 구하지 않은 상황 -> 넣어주어야 함 
-# out_f = [out['x'][0:3], out['x'][3:6], out['x'][6:9]]
-
-# # min parameter 을 이용해서 다시 한번 ansatz 를 계산한다 
-# circ = QuantumCircuit(3, 3)
-# apply_fixed_ansatz([0, 1, 2], out_f)
-# circ.save_statevector()
-
-# backend = Aer.get_backend('aer_simulator')
-
-# t_circ = transpile(circ, backend)
-# qobj = assemble(t_circ)
-# job = backend.run(qobj)
-
-# result = job.result()
-# # 그걸로 확률을 구한다 = |x> 
-# o = result.get_statevector(circ, decimals=10)
-
-# #얘가 실제 coeff 값을 토대로 만든 matrix A = 0.55I + 0.225Z_2 + 0.225Z_3
-# a1 = coefficient_set[2]*np.array([[1,0,0,0,0,0,0,0], [0,1,0,0,0,0,0,0], [0,0,1,0,0,0,0,0], [0,0,0,1,0,0,0,0], [0,0,0,0,-1,0,0,0], [0,0,0,0,0,-1,0,0], [0,0,0,0,0,0,-1,0], [0,0,0,0,0,0,0,-1]])
-# a0 = coefficient_set[1]*np.array([[1,0,0,0,0,0,0,0], [0,1,0,0,0,0,0,0], [0,0,-1,0,0,0,0,0], [0,0,0,-1,0,0,0,0], [0,0,0,0,1,0,0,0], [0,0,0,0,0,1,0,0], [0,0,0,0,0,0,-1,0], [0,0,0,0,0,0,0,-1]])
-# a2 = coefficient_set[0]*np.array([[1,0,0,0,0,0,0,0], [0,1,0,0,0,0,0,0], [0,0,1,0,0,0,0,0], [0,0,0,1,0,0,0,0], [0,0,0,0,1,0,0,0], [0,0,0,0,0,1,0,0], [0,0,0,0,0,0,1,0], [0,0,0,0,0,0,0,1]])
-# #이게 진짜 최종 matrix A 
-# a3 = np.add(np.add(a2, a0), a1)
-# #실제 b의 값 
-# #이친구 ||b|| 의 값이 1임 ㅋㅋㅋ 
-# b = np.array([float(1/np.sqrt(8)),float(1/np.sqrt(8)),float(1/np.sqrt(8)),float(1/np.sqrt(8)),float(1/np.sqrt(8)),float(1/np.sqrt(8)),float(1/np.sqrt(8)),float(1/np.sqrt(8))])
-
-# #결과 값이 1에 가까울수록 좋음 
-# # (b * (b' / ||b'||))^2 
-# print((b.dot(a3.dot(o)/(np.linalg.norm(a3.dot(o)))))**2)
 
 
