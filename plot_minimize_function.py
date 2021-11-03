@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 import scipy.optimize as op
 import numpy as np
 from functools import partial
-# 여기서 별 함수ㄹ 받
 
 Q = np.array([[1.0, 0.75, 0.45], [0.75, 1.0, 0.60], [0.45, 0.60, 1.0]])
 a = 1.0
@@ -37,5 +36,5 @@ for test in range(20):
                          callback=partial(cb, obj=op_obj))
     ax.plot(x, op_obj.f)
 
-ax.set_ylim((1.71,1.76))
+ax.set_ylim((0,1))
 plt.show()
