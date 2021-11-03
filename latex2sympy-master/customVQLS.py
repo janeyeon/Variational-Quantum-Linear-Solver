@@ -7,8 +7,8 @@ import numpy as np
 from scipy.optimize import minimize
 from circuit import had_test_circuit_long, had_test_circuit_short, specialh_circuit_short
 
-coefficient_set = [0.55, 0.225, 0.225]
-gate_set = [[0, 0, 0], [0, 1, 0], [0, 0, 1]]
+coefficient_set = [0.55, 0.45]
+gate_set = [[0, 0, 0], [0, 0, 1]]
 
 def apply_fixed_ansatz(qubits, parameters):
 
