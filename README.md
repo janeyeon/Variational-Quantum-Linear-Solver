@@ -9,7 +9,7 @@ We implemented the VQLS code by referring to the page below.
 [https://qiskit.org/textbook/ch-paper-implementations/vqls.html](https://qiskit.org/textbook/ch-paper-implementations/vqls.html)
 
 We improved the performance of the existing implementation based on qiskit, by using [Mathematica](https://www.wolfram.com/mathematica/) and [SymPy](https://www.sympy.org/).
-It is expected that our codebase can be utilized in various ways in further research.
+It is expected that our codebase can be utilized in various ways in further research such as in the field of Quantum Finance, Quantum Chemistry, Quantum Machine Learning, and Quantum Optimization.
 
 The overall procedure is as follows:
 
@@ -47,7 +47,7 @@ pip3 install antlr4-python3-runtime==4.9
 
     [https://github.com/antlr/antlr4/blob/master/doc/getting-started.md](https://github.com/antlr/antlr4/blob/master/doc/getting-started.md)
 
-3. And finally:
+3. Finally:
 
 ```bash
 antlr4 PS.g4 -o gen
