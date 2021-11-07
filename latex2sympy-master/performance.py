@@ -33,12 +33,11 @@ from customVQLS import calculate_cost_function as
 
 
 # ============== 공통적인 값 설정 ================
-#얘가 실제 coeff 값을 토대로 만든 matrix A = 0.55I + 0.225Z_2 + 0.225Z_3
-a1 = coefficient_set[2]*np.array([[1,0,0,0,0,0,0,0], [0,1,0,0,0,0,0,0], [0,0,1,0,0,0,0,0], [0,0,0,1,0,0,0,0], [0,0,0,0,-1,0,0,0], [0,0,0,0,0,-1,0,0], [0,0,0,0,0,0,-1,0], [0,0,0,0,0,0,0,-1]])
-a0 = coefficient_set[1]*np.array([[1,0,0,0,0,0,0,0], [0,1,0,0,0,0,0,0], [0,0,-1,0,0,0,0,0], [0,0,0,-1,0,0,0,0], [0,0,0,0,1,0,0,0], [0,0,0,0,0,1,0,0], [0,0,0,0,0,0,-1,0], [0,0,0,0,0,0,0,-1]])
+#얘가 실제 coeff 값을 토대로 만든 matrix A = 0.45Z_3 + 0.55I
+a1 = coefficient_set[1]*np.array([[1,0,0,0,0,0,0,0], [0,1,0,0,0,0,0,0], [0,0,1,0,0,0,0,0], [0,0,0,1,0,0,0,0], [0,0,0,0,-1,0,0,0], [0,0,0,0,0,-1,0,0], [0,0,0,0,0,0,-1,0], [0,0,0,0,0,0,0,-1]])
 a2 = coefficient_set[0]*np.array([[1,0,0,0,0,0,0,0], [0,1,0,0,0,0,0,0], [0,0,1,0,0,0,0,0], [0,0,0,1,0,0,0,0], [0,0,0,0,1,0,0,0], [0,0,0,0,0,1,0,0], [0,0,0,0,0,0,1,0], [0,0,0,0,0,0,0,1]])
 #이게 진짜 최종 matrix A 
-a3 = np.add(np.add(a2, a0), a1)
+a3 = np.add(a1, a2)
 #실제 b의 값 
 #이친구 ||b|| 의 값이 1임 ㅋㅋㅋ 
 b = np.array([float(1/np.sqrt(8)),float(1/np.sqrt(8)),float(1/np.sqrt(8)),float(1/np.sqrt(8)),float(1/np.sqrt(8)),float(1/np.sqrt(8)),float(1/np.sqrt(8)),float(1/np.sqrt(8))])
@@ -66,6 +65,8 @@ x = np.linspace(1,iter, iter)
 vqls_op_obj = OpObj()
 
 # cost function 을 minimize 하는 parameter alpha 값을 구한다 (9개)
+
+print("\n======== VQLS minimization =========\n")
 
 vqls_out = minimize(vqls_calculate_cost_function, x0= vqls_op_obj.x_0, args=(vqls_op_obj, callback), options={'maxiter':iter}, method="COBYLA")
 
@@ -98,12 +99,13 @@ short_vqls_op_obj = OpObj()
 
 # cost function 을 minimize 하는 parameter alpha 값을 구한다 (9개)
 
+print("\n======== short custom VQLS minimization =========\n")
+
 short_vqls_out = minimize(short_vqls_calculate_cost_function, x0= short_vqls_op_obj.x_0, args=(short_vqls_op_obj, callback), options={'maxiter':iter}, method="COBYLA")
 
 plt.plot(x, short_vqls_op_obj.f, label='custom VQLS short version')
 
 # 여기서 부터는 구한 결과로 비교하는 부분 
-
 # 구한 output 을 쪼갠다  
 # 아직 out을 구하지 않은 상황 -> 넣어주어야 함 
 short_vqls_out_f = [short_vqls_out['x'][0:3], short_vqls_out['x'][3:6], short_vqls_out['x'][6:9]]
@@ -129,8 +131,6 @@ short_vqls_o = short_vqls_result.get_statevector(short_vqls_circ, decimals=10)
 print("vqls result: ", (b.dot(a3.dot(vqls_o)/(np.linalg.norm(a3.dot(vqls_o)))))**2)
 
 print("short custom vqls result: ", (b.dot(a3.dot(short_vqls_o)/(np.linalg.norm(a3.dot(short_vqls_o)))))**2)
-
-
 
 #=========== plot =============
 plt.xlabel('num of iteration', labelpad=15)
