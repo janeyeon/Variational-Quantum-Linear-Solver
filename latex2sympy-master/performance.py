@@ -8,7 +8,28 @@ import matplotlib.pyplot as plt
 from vqls import apply_fixed_ansatz, coefficient_set
 from vqls import calculate_cost_function as vqls_calculate_cost_function
 
-from customVQLS import calculate_cost_function as short_vqls_calculate_cost_function
+from customVQLS import calculate_cost_function as 
+
+
+
+    def apply_fixed_ansatz(qubits, parameters):
+
+        for iz in range (0, len(qubits)):
+            circ.ry(parameters[0][iz], qubits[iz])
+
+        circ.cz(qubits[0], qubits[1])
+        circ.cz(qubits[2], qubits[0])
+
+        for iz in range (0, len(qubits)):
+            circ.ry(parameters[1][iz], qubits[iz])
+
+        circ.cz(qubits[1], qubits[2])
+        circ.cz(qubits[2], qubits[0])
+
+        for iz in range (0, len(qubits)):
+            circ.ry(parameters[2][iz], qubits[iz])
+
+
 
 
 # ============== 공통적인 값 설정 ================
