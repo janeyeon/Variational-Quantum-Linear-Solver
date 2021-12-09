@@ -1,10 +1,14 @@
 import qiskit
-from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
-from qiskit import Aer, transpile, assemble
 import random
 import numpy as np
-from scipy.optimize import minimize
+import time
 import matplotlib.pyplot as plt
+
+from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
+from qiskit import Aer, transpile, assemble
+
+from scipy.optimize import minimize
+
 from vqls import apply_fixed_ansatz, coefficient_set
 from vqls import calculate_cost_function as vqls_calculate_cost_function
 
@@ -27,6 +31,7 @@ iter = 200
 class OpObj(object):
     def __init__(self):
         #맨처음 params의 초기값 
+        random.seed(1234)
         self.x_0 = [float(random.randint(0,3000))/1000 for i in range(0, 9)]
         #minimize 중간에 뽑아져 나오는 값을 담을 변수
         self.f = np.full(shape=(iter,), fill_value=np.NaN)
@@ -40,14 +45,18 @@ def callback(xk, obj=None):
 
 x = np.linspace(1,iter, iter)
 
-#====================== for vqls ======================
+#====================== for VQLS ======================
 vqls_op_obj = OpObj()
 
 # cost function 을 minimize 하는 parameter alpha 값을 구한다 (9개)
 
 print("\n======== VQLS minimization =========\n")
 
+start_vqls = time.time()
+
 vqls_out = minimize(vqls_calculate_cost_function, x0= vqls_op_obj.x_0, args=(vqls_op_obj, callback), options={'maxiter':iter}, method="COBYLA")
+
+time_vqls = time.time() - start_vqls
 
 plt.plot(x, vqls_op_obj.f, label='VQLS version')
 
@@ -72,7 +81,7 @@ vqls_result = vqls_job.result()
 # 그걸로 확률을 구한다 = |x> 
 vqls_o = vqls_result.get_statevector(vqls_circ, decimals=10)
 
-#====================== for short custom vqls ====================== 
+#====================== for short custom VQLS ====================== 
 
 short_vqls_op_obj = OpObj()
 
@@ -80,7 +89,11 @@ short_vqls_op_obj = OpObj()
 
 print("\n======== short custom VQLS minimization =========\n")
 
+start_short_vqls = time.time()
+
 short_vqls_out = minimize(short_vqls_calculate_cost_function, x0= short_vqls_op_obj.x_0, args=(short_vqls_op_obj, callback), options={'maxiter':iter}, method="COBYLA")
+
+time_short_vqls = time.time() - start_short_vqls
 
 plt.plot(x, short_vqls_op_obj.f, label='custom VQLS short version')
 
@@ -104,12 +117,17 @@ short_vqls_result = short_vqls_job.result()
 # 그걸로 확률을 구한다 = |x> 
 short_vqls_o = short_vqls_result.get_statevector(short_vqls_circ, decimals=10)
 
-
-
 #========= print ============
-print("vqls result: ", (b.dot(a3.dot(vqls_o)/(np.linalg.norm(a3.dot(vqls_o)))))**2)
+print("")
+print("VQLS Result: ", (b.dot(a3.dot(vqls_o)/(np.linalg.norm(a3.dot(vqls_o)))))**2)
+print("VQLS Calculation time (s) : ", time_vqls)
 
-print("short custom vqls result: ", (b.dot(a3.dot(short_vqls_o)/(np.linalg.norm(a3.dot(short_vqls_o)))))**2)
+print("")
+print("Short Custom VQLS Result: ", (b.dot(a3.dot(short_vqls_o)/(np.linalg.norm(a3.dot(short_vqls_o)))))**2)
+print("Short Custom VQLS Calculation time (s) : ", time_short_vqls)
+
+print("")
+print("Speedup : ", time_vqls/time_short_vqls)
 
 #=========== plot =============
 plt.xlabel('num of iteration', labelpad=15)

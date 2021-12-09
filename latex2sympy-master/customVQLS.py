@@ -5,94 +5,24 @@ import math
 import random
 import numpy as np
 from scipy.optimize import minimize
-from circuit import had_test_circuit_long, had_test_circuit_short, specialh_circuit_short
+from circuit import had_test_circuit_short, had_test_circuit_long, specialh_circuit_short_I, specialh_circuit_long_I, specialh_circuit_short_Z3, specialh_circuit_long_Z3
 
+# A = 0.45Z_3 + 0.55I
 coefficient_set = [0.55, 0.45]
 gate_set = [[0, 0, 0], [0, 0, 1]]
 
-def apply_fixed_ansatz(qubits, parameters):
-
-    for iz in range (0, len(qubits)):
-        circ.ry(parameters[0][iz], qubits[iz])
-
-    circ.cz(qubits[0], qubits[1])
-    circ.cz(qubits[2], qubits[0])
-
-    for iz in range (0, len(qubits)):
-        circ.ry(parameters[1][iz], qubits[iz])
-
-    circ.cz(qubits[1], qubits[2])
-    circ.cz(qubits[2], qubits[0])
-
-    for iz in range (0, len(qubits)):
-        circ.ry(parameters[2][iz], qubits[iz])
-
-
-# Creates the Hadamard test
-
 def had_test(parameters):
     #이곳에 가져온 had_test를 넣어주면 된다
-    return had_test_circuit_short(parameters).evalf()
-    
+    return had_test_circuit_short(parameters)
 
-# Creates controlled anstaz for calculating |<b|psi>|^2 with a Hadamard test
+def specialh_I(parameters):
+    return specialh_circuit_short_I(parameters)
 
-def control_fixed_ansatz(qubits, parameters, auxiliary, reg):
-
-    for i in range (0, len(qubits)):
-        circ.cry(parameters[0][i], qiskit.circuit.Qubit(reg, auxiliary), qiskit.circuit.Qubit(reg, qubits[i]))
-
-    circ.ccx(auxiliary, qubits[1], 4)
-    circ.cz(qubits[0], 4)
-    circ.ccx(auxiliary, qubits[1], 4)
-
-    circ.ccx(auxiliary, qubits[0], 4)
-    circ.cz(qubits[2], 4)
-    circ.ccx(auxiliary, qubits[0], 4)
-
-    for i in range (0, len(qubits)):
-        circ.cry(parameters[1][i], qiskit.circuit.Qubit(reg, auxiliary), qiskit.circuit.Qubit(reg, qubits[i]))
-
-    circ.ccx(auxiliary, qubits[2], 4)
-    circ.cz(qubits[1], 4)
-    circ.ccx(auxiliary, qubits[2], 4)
-
-    circ.ccx(auxiliary, qubits[0], 4)
-    circ.cz(qubits[2], 4)
-    circ.ccx(auxiliary, qubits[0], 4)
-
-    for i in range (0, len(qubits)):
-        circ.cry(parameters[2][i], qiskit.circuit.Qubit(reg, auxiliary), qiskit.circuit.Qubit(reg, qubits[i]))
-
-
-def control_b(auxiliary, qubits):
-
-    for ia in qubits:
-        circ.ch(auxiliary, ia)
-
-
-# Create the controlled Hadamard test, for calculating <psi|psi>
-
-def special_had_test(gate_type, qubits, auxiliary_index, parameters, reg):
-    # 여기에서 사용된 circ 는 
-    # (아마) 자기 함수가 불린 scope 의 가장 인접한 부분의 circ 변수를 부르는 것일듯  
-    circ.h(auxiliary_index)
-
-    control_fixed_ansatz(qubits, parameters, auxiliary_index, reg)
-
-    for ty in range (0, len(gate_type)):
-        if (gate_type[ty] == 1):
-            circ.cz(auxiliary_index, qubits[ty])
-
-
-    control_b(auxiliary_index, qubits)
-    
-    circ.h(auxiliary_index)
-
+def specialh_Z3(parameters):
+    return specialh_circuit_short_Z3(parameters)
 
 # ========================= learning start =========================
 # A = 0.55I + 0.225Z_2 + 0.225Z_3
-
 # Implements the entire cost function on the quantum circuit
 
 def calculate_cost_function(parameters, op_obj, callback):
@@ -110,9 +40,9 @@ def calculate_cost_function(parameters, op_obj, callback):
             
             multiply = coefficient_set[i]*coefficient_set[j]
             if(i != j):
-                m_sum = had_test(parameters)
+                m_sum = had_test(parameters) # i != j 이면 CZ_3 가 있는 회로, 이게 우리가 구현했던 had_test_circuit_short 임
             else :
-                m_sum = 0 # 임시로 이렇게 구현
+                m_sum = 0 # 임시로 이렇게 구현, i=j 이면 A^* A = I 여서 아무런 효과 없는 것과 마찬가지. (A = 0.55I + 0.45Z3 문제에 한정적)
 
             overall_sum_1+=multiply*(1-(2*m_sum))
 
@@ -125,32 +55,23 @@ def calculate_cost_function(parameters, op_obj, callback):
             mult = 1
 
             for extra in range(0, 2):
-
-                qctl = QuantumRegister(5)
-                qc = ClassicalRegister(5)
-                circ = QuantumCircuit(qctl, qc)
-
-                backend = Aer.get_backend('aer_simulator')
-
+                
                 if (extra == 0):
-                    special_had_test(gate_set[i], [1, 2, 3], 0, parameters, qctl)
+                    #special_had_test(gate_set[i], [1, 2, 3], 0, parameters, qctl)
+                    if (gate_set[i]==[0,0,0]):
+                        m_sum = specialh_I(parameters)
+                    elif (gate_set[i]==[0,0,1]):
+                        m_sum = specialh_Z3(parameters)
+
                 if (extra == 1):
-                    special_had_test(gate_set[j], [1, 2, 3], 0, parameters, qctl)
+                    #special_had_test(gate_set[j], [1, 2, 3], 0, parameters, qctl)
+                    if (gate_set[j]==[0,0,0]):
+                        m_sum = specialh_I(parameters)
+                    elif (gate_set[j]==[0,0,1]):
+                        m_sum = specialh_Z3(parameters)
+                
+                m_sum = 1-m_sum #이건 실수, mathematica 파일 바꿔야함 
 
-                circ.save_statevector()    
-                t_circ = transpile(circ, backend)
-                qobj = assemble(t_circ)
-                job = backend.run(qobj)
-
-                result = job.result()
-                outputstate = np.real(result.get_statevector(circ, decimals=100))
-                o = outputstate
-
-                m_sum = 0
-                for l in range (0, len(o)):
-                    if (l%2 == 1):
-                        n = o[l]**2
-                        m_sum+=n
                 mult = mult*(1-(2*m_sum))
 
             overall_sum_2+=multiply*mult
