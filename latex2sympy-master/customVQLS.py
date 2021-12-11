@@ -26,7 +26,7 @@ def specialh_Z3(parameters):
 # Implements the entire cost function on the quantum circuit
 
 def calculate_cost_function(parameters, op_obj, callback):
-    
+
     global opt
 
     overall_sum_1 = 0

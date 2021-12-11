@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 coefficient_set = [0.55, 0.45]
 gate_set = [[0, 0, 0], [0, 0, 1]]
 
-def apply_fixed_ansatz(qubits, parameters):
+def apply_fixed_ansatz(qubits, parameters, circ):
 
     for iz in range (0, len(qubits)):
         circ.ry(parameters[0][iz], qubits[iz])
@@ -33,7 +33,7 @@ def had_test(gate_type, qubits, auxiliary_index, parameters):
 
     circ.h(auxiliary_index)
 
-    apply_fixed_ansatz(qubits, parameters)
+    apply_fixed_ansatz(qubits, parameters, circ)
 
     for ie in range (0, len(gate_type[0])):
         if (gate_type[0][ie] == 1):
@@ -99,17 +99,13 @@ def special_had_test(gate_type, qubits, auxiliary_index, parameters, reg):
     
     circ.h(auxiliary_index)
 
-
-
-
 # ========================= learning start =========================
 # A = 0.55I + 0.225Z_2 + 0.225Z_3
-
 
 # Implements the entire cost function on the quantum circuit
 
 def calculate_cost_function(parameters, op_obj, callback):
-    
+
     global opt
 
     overall_sum_1 = 0

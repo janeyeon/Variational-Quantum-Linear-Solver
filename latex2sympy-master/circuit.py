@@ -68,8 +68,6 @@ print("Processing Short done!")
 
 # print("Processing Long done!")
 
-#print(had_test_circuit_short([[1, 1, 1], [1, 1, 1], [1, 1, 1]]))
-#print(specialh_circuit_short_I([[1, 1, 1], [1, 1, 1], [1, 1, 1]]))
 print("Processing circuit done!")
 
 print("Processing time (s): ", time.time() - start)

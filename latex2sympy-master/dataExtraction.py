@@ -11,7 +11,7 @@ specialhtest_long_Z3_name = "specialhtest_tex_long_Z3.tex"
 def download(file_name = ""):
     with open("./result/" + file_name, "r") as f: 
         file = f.read()
-        print("download file success")
+        #print("download file success")
         return file
     
 
@@ -25,3 +25,5 @@ specialh_long_I = download(file_name=specialhtest_long_I_name)
 specialh_short_I = download(file_name=specialhtest_short_I_name)
 specialh_long_Z3 = download(file_name=specialhtest_long_Z3_name)
 specialh_short_Z3 = download(file_name=specialhtest_short_Z3_name)
+
+print("Download file success!")

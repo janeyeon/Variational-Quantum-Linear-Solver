@@ -14,7 +14,6 @@ from vqls import calculate_cost_function as vqls_calculate_cost_function
 
 from customVQLS import calculate_cost_function as short_vqls_calculate_cost_function
 
-
 # ============== 공통적인 값 설정 ================
 #얘가 실제 coeff 값을 토대로 만든 matrix A = 0.45Z_3 + 0.55I
 a1 = coefficient_set[1]*np.array([[1,0,0,0,0,0,0,0], [0,1,0,0,0,0,0,0], [0,0,1,0,0,0,0,0], [0,0,0,1,0,0,0,0], [0,0,0,0,-1,0,0,0], [0,0,0,0,0,-1,0,0], [0,0,0,0,0,0,-1,0], [0,0,0,0,0,0,0,-1]])
@@ -31,7 +30,7 @@ iter = 200
 class OpObj(object):
     def __init__(self):
         #맨처음 params의 초기값 
-        random.seed(1234)
+        random.seed(81)
         self.x_0 = [float(random.randint(0,3000))/1000 for i in range(0, 9)]
         #minimize 중간에 뽑아져 나오는 값을 담을 변수
         self.f = np.full(shape=(iter,), fill_value=np.NaN)
@@ -68,7 +67,8 @@ vqls_out_f = [vqls_out['x'][0:3], vqls_out['x'][3:6], vqls_out['x'][6:9]]
 
 # min parameter 을 이용해서 다시 한번 ansatz 를 계산한다 
 vqls_circ = QuantumCircuit(3, 3)
-apply_fixed_ansatz([0, 1, 2], vqls_out_f)
+
+apply_fixed_ansatz([0, 1, 2], vqls_out_f, vqls_circ)
 vqls_circ.save_statevector()
 
 backend = Aer.get_backend('aer_simulator')
@@ -104,7 +104,7 @@ short_vqls_out_f = [short_vqls_out['x'][0:3], short_vqls_out['x'][3:6], short_vq
 
 # min parameter 을 이용해서 다시 한번 ansatz 를 계산한다 
 short_vqls_circ = QuantumCircuit(3, 3)
-apply_fixed_ansatz([0, 1, 2], short_vqls_out_f)
+apply_fixed_ansatz([0, 1, 2], short_vqls_out_f, short_vqls_circ)
 short_vqls_circ.save_statevector()
 
 backend = Aer.get_backend('aer_simulator')
@@ -118,11 +118,17 @@ short_vqls_result = short_vqls_job.result()
 short_vqls_o = short_vqls_result.get_statevector(short_vqls_circ, decimals=10)
 
 #========= print ============
+print("\n======VQLS RESULT======\n")
+print(vqls_out)
 print("")
+print(vqls_o)
 print("VQLS Result: ", (b.dot(a3.dot(vqls_o)/(np.linalg.norm(a3.dot(vqls_o)))))**2)
 print("VQLS Calculation time (s) : ", time_vqls)
 
+print("\n======Short Custom VQLS RESULT======\n")
+print(short_vqls_out)
 print("")
+print(short_vqls_o)
 print("Short Custom VQLS Result: ", (b.dot(a3.dot(short_vqls_o)/(np.linalg.norm(a3.dot(short_vqls_o)))))**2)
 print("Short Custom VQLS Calculation time (s) : ", time_short_vqls)
 
@@ -130,8 +136,8 @@ print("")
 print("Speedup : ", time_vqls/time_short_vqls)
 
 #=========== plot =============
-plt.xlabel('num of iteration', labelpad=15)
-plt.ylabel('1-float(overall_sum_2/overall_sum_1)', labelpad=15)
+plt.xlabel('num of iteration', labelpad=10)
+plt.ylabel('1-float(overall_sum_2/overall_sum_1)', labelpad=10)
 plt.legend()
 plt.show()
 
